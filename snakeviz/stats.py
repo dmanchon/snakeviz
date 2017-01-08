@@ -2,8 +2,40 @@ from __future__ import division
 
 import os.path
 from itertools import chain
+import re
 
-from tornado.escape import xhtml_escape
+_XHTML_ESCAPE_RE = re.compile('[&<>"\']')
+_XHTML_ESCAPE_DICT = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;',
+                      '\'': '&#39;'}
+basestring_type = str
+_BASESTRING_TYPES = (basestring_type, type(None))
+
+def xhtml_escape(value):
+    """Escapes a string so it is valid within HTML or XML.
+    Escapes the characters ``<``, ``>``, ``"``, ``'``, and ``&``.
+    When used in attribute values the escaped strings must be enclosed
+    in quotes.
+    .. versionchanged:: 3.2
+       Added the single quote to the list of escaped characters.
+    """
+    return _XHTML_ESCAPE_RE.sub(lambda match: _XHTML_ESCAPE_DICT[match.group(0)],
+                                to_basestring(value))
+
+def to_basestring(value):
+    """Converts a string argument to a subclass of basestring.
+    In python2, byte and unicode strings are mostly interchangeable,
+    so functions that deal with a user-supplied argument in combination
+    with ascii string constants can use either and should return the type
+    the user supplied.  In python3, the two types are not interchangeable,
+    so this method is needed to convert byte strings to unicode.
+    """
+    if isinstance(value, _BASESTRING_TYPES):
+        return value
+    if not isinstance(value, bytes):
+        raise TypeError(
+            "Expected bytes, unicode, or None; got %r" % type(value)
+        )
+    return value.decode("utf-8")
 
 
 def table_rows(stats):

@@ -56,7 +56,7 @@ setup(
                      'static/images/*.png',
                      'templates/*.html']
     },
-    install_requires=['tornado>=2.0', 'aiohttp_jinja2', 'aiohttp'],
+    install_requires=['aiohttp_jinja2', 'aiohttp'],
     entry_points={
         'console_scripts': ['snakeviz = snakeviz.cli:main']
     }

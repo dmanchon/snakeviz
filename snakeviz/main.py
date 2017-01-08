@@ -28,22 +28,26 @@ settings = {
 
 
 def viz_handler(request):
+    pr.disable()
     try:
-        pr.disable()
         sio = io.StringIO()
         ps = pstats.Stats(pr, stream=sio)
         temp = tempfile.NamedTemporaryFile()
         ps.dump_stats(temp.name)
-        pr.enable()
         s = Stats(temp.name)
         temp.close()
+        context = {
+            'table_rows': table_rows(s),
+            'callees': json_stats(s), 
+            'profile_name': temp.name, 
+            'path': path
+        }
+        response = aiohttp_jinja2.render_template('viz.html', request, context)
     except:
         raise RuntimeError('Could not read %s.' % profile_name)
-
-    context = {'table_rows': table_rows(s), 'callees': json_stats(s), 'profile_name': temp.name, 'path': path}
-    response = aiohttp_jinja2.render_template('viz.html',
-                                              request,
-                                              context)
+    finally:
+        pr.enable()
+    
     return response
 
 def get_app(profile, app_path):
