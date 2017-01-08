@@ -15,6 +15,7 @@ from .stats import table_rows, json_stats
 import cProfile, pstats, io
 import os
 import tempfile
+from yarl import URL
 
 pr = None
 path = 'stats'
@@ -30,6 +31,15 @@ settings = {
 def viz_handler(request):
     pr.disable()
     try:
+        if 'X-VirtualHost-Monster' in request.headers:
+            base_url = request.headers['X-VirtualHost-Monster']
+            if base_url[-1] == '/':
+                base_url = base_url[:-1]
+            p = str(URL(base_url).relative())
+            prefix = p.split('/oauth/')[0]
+            prefix = '' if prefix == '/' else prefix
+            if prefix != '':
+                path = prefix + '/' + path
         sio = io.StringIO()
         ps = pstats.Stats(pr, stream=sio)
         temp = tempfile.NamedTemporaryFile()
