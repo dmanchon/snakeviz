@@ -6,10 +6,10 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="/static/snakeviz.css" rel="stylesheet">
+    <link href="/{{path}}/static/snakeviz.css" rel="stylesheet">
 
     <!-- DataTables CSS -->
-    <link href="/static/vendor/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="/{{path}}/static/vendor/jquery.dataTables.min.css" rel="stylesheet">
   </head>
 
   <body>
@@ -30,8 +30,8 @@
     <label id='sv-depth-label'>Depth:
       <select name="sv-depth" id="sv-depth-select">
         {% for i in [3, 5, 10, 15, 20] %}
-          <option value="{{i}}" {% if i == 5 %}selected{% end %}>{{i}}</option>
-        {% end %}
+          <option value="{{i}}" {% if i == 5 %}selected{% endif %}>{{i}}</option>
+        {% endfor %}
       </select>
     </label>
 
@@ -89,16 +89,16 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <!-- Vendor JS -->
-    <script src="/static/vendor/jquery-1.11.1.min.js"></script>
-    <script src="/static/vendor/d3.min.js"></script>
-    <script src="/static/vendor/jquery.dataTables.min.js"></script>
-    <script src="/static/vendor/lodash.compat.min.js"></script>
-    <script src="/static/vendor/immutable.min.js"></script>
+    <script src="/{{path}}/static/vendor/jquery-1.11.1.min.js"></script>
+    <script src="/{{path}}/static/vendor/d3.min.js"></script>
+    <script src="/{{path}}/static/vendor/jquery.dataTables.min.js"></script>
+    <script src="/{{path}}/static/vendor/lodash.compat.min.js"></script>
+    <script src="/{{path}}/static/vendor/immutable.min.js"></script>
 
     <!-- SnakeViz JS -->
     <script>
       // Make the stats table
-      var table_data = {% raw table_rows %};
+      var table_data =  {{ table_rows }} ;
       $(document).ready(function() {
         $('#pstats-table').dataTable({
           'data': table_data,
@@ -129,7 +129,7 @@
       // can be stopped and restarted without loading the code from the server,
       // and so that the stats data can be embedded in the worker.
 
-      var stats = {% raw callees %};
+      var stats =  {{callees}} ;
       var sv_base_size = 1000;
       function sv_build_hierarchy(
           root_name, depth, cutoff, node_size, parent_name, call_stack) {
@@ -235,8 +235,8 @@
         catch (e) {
           try {
             importScripts(
-              event.data['url'] + "/static/vendor/immutable.min.js",
-              event.data['url'] + "/static/vendor/lodash.compat.min.js");
+              event.data['url'] + "/{{path}}/static/vendor/immutable.min.js",
+              event.data['url'] + "/{{path}}/static/vendor/lodash.compat.min.js");
           }
           catch (e) {
             throw 'Could not load JS libraries in worker.';
@@ -253,14 +253,14 @@
     </script>
 
     <!-- Load SnakeViz JS Files -->
-    <script src='/static/snakeviz.js'></script>
-    <script src='/static/drawsvg.js'></script>
+    <script src='/{{path}}/static/snakeviz.js'></script>
+    <script src='/{{path}}/static/drawsvg.js'></script>
 
     <!-- Do initial setup stuff -->
     <script>
       // Initialize data
       $(document).ready(_.defer(function () {
-        var profile_data = {% raw callees %};
+        var profile_data =  {{callees}} ;
         sv_json_cache = {};
         sv_worker = sv_make_worker();
         sv_root_func_name = sv_find_root(profile_data);

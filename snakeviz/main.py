@@ -8,10 +8,16 @@ try:
 except ImportError:
     from urllib import unquote_plus
 
-import tornado.ioloop
-import tornado.web
-
+import aiohttp.web
+import aiohttp_jinja2
+import jinja2
 from .stats import table_rows, json_stats
+import cProfile, pstats, io
+import os
+import tempfile
+
+pr = None
+path = 'stats'
 
 settings = {
     'static_path': os.path.join(os.path.dirname(__file__), 'static'),
@@ -21,22 +27,32 @@ settings = {
 }
 
 
-class VizHandler(tornado.web.RequestHandler):
-    def get(self, profile_name):
-        profile_name = unquote_plus(profile_name)
-        try:
-            s = Stats(profile_name)
-        except:
-            raise RuntimeError('Could not read %s.' % profile_name)
-        self.render(
-            'viz.html', profile_name=profile_name,
-            table_rows=table_rows(s), callees=json_stats(s))
+def viz_handler(request):
+    try:
+        pr.disable()
+        sio = io.StringIO()
+        ps = pstats.Stats(pr, stream=sio)
+        temp = tempfile.NamedTemporaryFile()
+        ps.dump_stats(temp.name)
+        pr.enable()
+        s = Stats(temp.name)
+        temp.close()
+    except:
+        raise RuntimeError('Could not read %s.' % profile_name)
 
+    context = {'table_rows': table_rows(s), 'callees': json_stats(s), 'profile_name': temp.name, 'path': path}
+    response = aiohttp_jinja2.render_template('viz.html',
+                                              request,
+                                              context)
+    return response
 
-handlers = [(r'/snakeviz/(.*)', VizHandler)]
-
-app = tornado.web.Application(handlers, **settings)
-
-if __name__ == '__main__':
-    app.listen(8080)
-    tornado.ioloop.IOLoop.instance().start()
+def get_app(profile, app_path):
+    global pr, path
+    pr = profile
+    path = app_path
+    app = aiohttp.web.Application()
+    app.router.add_static('/static', settings['static_path'])
+    aiohttp_jinja2.setup(app,
+        loader=jinja2.FileSystemLoader(settings['template_path']))
+    app.router.add_get('/', viz_handler)
+    return app
