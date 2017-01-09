@@ -31,6 +31,7 @@ settings = {
 def viz_handler(request):
     pr.disable()
     try:
+        real_path = path
         if 'X-VirtualHost-Monster' in request.headers:
             base_url = request.headers['X-VirtualHost-Monster']
             if base_url[-1] == '/':
@@ -39,7 +40,7 @@ def viz_handler(request):
             prefix = p.split('/oauth/')[0]
             prefix = '' if prefix == '/' else prefix
             if prefix != '':
-                path = prefix + '/' + path
+                real_path = prefix + '/' + real_path
         sio = io.StringIO()
         ps = pstats.Stats(pr, stream=sio)
         temp = tempfile.NamedTemporaryFile()
@@ -50,7 +51,7 @@ def viz_handler(request):
             'table_rows': table_rows(s),
             'callees': json_stats(s), 
             'profile_name': temp.name, 
-            'path': path
+            'path': real_path
         }
         response = aiohttp_jinja2.render_template('viz.html', request, context)
     except:
