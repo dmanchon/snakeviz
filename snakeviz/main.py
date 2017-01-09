@@ -31,16 +31,12 @@ settings = {
 def viz_handler(request):
     pr.disable()
     try:
-        real_path = path
+        real_path = str(request.url)
         if 'X-VirtualHost-Monster' in request.headers:
             base_url = request.headers['X-VirtualHost-Monster']
             if base_url[-1] == '/':
                 base_url = base_url[:-1]
-            p = str(URL(base_url).relative())
-            prefix = p.split('/oauth/')[0]
-            prefix = '' if prefix == '/' else prefix
-            if prefix != '':
-                real_path = prefix + '/' + real_path
+            real_path = base_url + request.path
         sio = io.StringIO()
         ps = pstats.Stats(pr, stream=sio)
         temp = tempfile.NamedTemporaryFile()

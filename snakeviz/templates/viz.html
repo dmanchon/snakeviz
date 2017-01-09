@@ -6,10 +6,10 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="/{{path}}/static/snakeviz.css" rel="stylesheet">
+    <link href="{{path}}static/snakeviz.css" rel="stylesheet">
 
     <!-- DataTables CSS -->
-    <link href="/{{path}}/static/vendor/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="{{path}}static/vendor/jquery.dataTables.min.css" rel="stylesheet">
   </head>
 
   <body>
@@ -89,11 +89,11 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <!-- Vendor JS -->
-    <script src="/{{path}}/static/vendor/jquery-1.11.1.min.js"></script>
-    <script src="/{{path}}/static/vendor/d3.min.js"></script>
-    <script src="/{{path}}/static/vendor/jquery.dataTables.min.js"></script>
-    <script src="/{{path}}/static/vendor/lodash.compat.min.js"></script>
-    <script src="/{{path}}/static/vendor/immutable.min.js"></script>
+    <script src="{{path}}static/vendor/jquery-1.11.1.min.js"></script>
+    <script src="{{path}}static/vendor/d3.min.js"></script>
+    <script src="{{path}}static/vendor/jquery.dataTables.min.js"></script>
+    <script src="{{path}}static/vendor/lodash.compat.min.js"></script>
+    <script src="{{path}}static/vendor/immutable.min.js"></script>
 
     <!-- SnakeViz JS -->
     <script>
@@ -235,8 +235,8 @@
         catch (e) {
           try {
             importScripts(
-              event.data['url'] + "/{{path}}/static/vendor/immutable.min.js",
-              event.data['url'] + "/{{path}}/static/vendor/lodash.compat.min.js");
+              event.data['url'] + "{{path}}static/vendor/immutable.min.js",
+              event.data['url'] + "{{path}}static/vendor/lodash.compat.min.js");
           }
           catch (e) {
             throw 'Could not load JS libraries in worker.';
@@ -253,8 +253,8 @@
     </script>
 
     <!-- Load SnakeViz JS Files -->
-    <script src='/{{path}}/static/snakeviz.js'></script>
-    <script src='/{{path}}/static/drawsvg.js'></script>
+    <script src='{{path}}static/snakeviz.js'></script>
+    <script src='{{path}}static/drawsvg.js'></script>
 
     <!-- Do initial setup stuff -->
     <script>
